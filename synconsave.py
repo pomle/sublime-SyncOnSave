@@ -1,37 +1,131 @@
 import sublime
 import sublime_plugin
-import os
+import subprocess
+import threading
+
+
+class SyncManager(object):
+
+    def __init__(self, cwd, source='./'):
+        self.cwd = cwd
+        self.source = source
+        self.processes = []
+
+    def add_remote(self, remote):
+        process = ThreadedSyncer(self.source, remote)
+        self.processes.append(process)
+
+    def sync(self, delete=False):
+        for process in self.processes:
+            process.cwd = self.cwd
+            process.delete = delete
+            process.start()
+
+
+class ThreadedSyncer(threading.Thread):
+
+    def __init__(self, source, remote):
+        self.cwd = None
+        self.delete = False
+        self.source = source
+        self.remote = remote
+        self.result = None
+        threading.Thread.__init__(self)
+
+    def run(self):
+        commands = ['rsync',
+                    '-ruv',
+                    '--relative',
+                    self.source,
+                    self.remote.strip('/') + '/']
+
+        if self.delete:
+            commands.append('--delete')
+
+        print ('Calling subprocess "%s" from working dir %s' %
+               (" ".join(commands), self.cwd))
+
+        subprocess.check_call(commands, cwd=self.cwd)
+
+        print ('Completed syncing path "%s" to "%s" in folder "%s"' %
+               (self.source, self.remote, self.cwd))
+
+
+def get_sync_config(view):
+    config = view.settings().get('sync_on_save')
+    project_folders = view.window().folders()
+
+    parsed_config = []
+
+    if not config:
+        print 'Sync: Project not configured for sync.'
+        return False
+
+    # Intercept legacy config and update it
+    if (isinstance(config, basestring)
+        or (isinstance(config, list) and isinstance(config[0], basestring))):
+        remotes = config
+        if isinstance(remotes, basestring):
+            remotes = [remotes]
+
+        # Legacy always uses only first folder
+        project_folders = [view.window().folders()[0]]
+        config = [{
+            "source": project_folders[0],
+            "remotes": remotes
+        }]
+
+    for path in config:
+        source = path.get('source')
+        if source not in project_folders:
+            print ("Skipping %s because not project folder %s",
+                   (source, project_folders))
+            continue
+        parsed_config.append({
+            "source": source,
+            "remotes": path.get('remotes'),
+        })
+
+    return parsed_config
+
+
+class ResyncCommand(sublime_plugin.TextCommand):
+
+    def run(self, edit, delete=False):
+        sync_config = get_sync_config(self.view)
+        if not sync_config:
+            sublime.message_dialog("No sync configured")
+            return
+
+        if delete and not sublime.ok_cancel_dialog("Are you sure you want to sync and delete all unknown files?"):
+            return
+
+        for path in sync_config:
+            syncer = SyncManager(path['source'])
+            for remote in path['remotes']:
+                syncer.add_remote(remote)
+            syncer.sync(delete)
 
 
 class SyncOnSave(sublime_plugin.EventListener):
 
     def on_post_save(self, view):
-        def shellquote(s):
-            return "'" + s.replace("'", "'\\''") + "'"
-
-        remote_dirs = view.settings().get('sync_on_save')
-        if not remote_dirs:
-            print 'SyncOnSave: Project not configured for sync_on_save. Try setting sync_on_save in project settings.'
+        sync_config = get_sync_config(view)
+        if not sync_config:
             return
 
-        if isinstance(remote_dirs, basestring):
-            remote_dirs = [remote_dirs]
-
-        folder = view.window().folders()[0]
         file_name = view.window().active_view().file_name()
 
-        if folder not in file_name:
-            print 'File %s not child of %s' % (file_name, folder)
-            return
+        for path in sync_config:
+            folder = path['source']
+            if folder not in file_name:
+                print 'File %s not child of %s' % (file_name, folder)
+                continue
 
-        relative_file_name = file_name.replace(folder, '').strip('/')
+            relative_file_name = file_name.replace(folder, '').strip('/')
 
-        commands = []
-        for remote_dir in remote_dirs:
-            remote_dir = remote_dir.strip('/') + '/'
-            command = 'rsync --relative %s %s' % (
-                shellquote(relative_file_name), shellquote(remote_dir))
-            commands.append(command)
+            syncer = SyncManager(folder, relative_file_name)
+            for remote in path['remotes']:
+                syncer.add_remote(remote)
 
-        view.window().run_command(
-            'exec', {'cmd': [" && ".join(commands)], 'working_dir': folder, 'shell': True})
+            syncer.sync()

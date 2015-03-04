@@ -1,0 +1,23 @@
+[
+    {
+        "id": "project",
+        "children":
+        [
+            {
+                "caption": "Sync",
+                "children": [
+                    {
+                        "caption": "All",
+                        "command": "resync",
+                        "args": { "delete": false }
+                    },
+                    {
+                        "caption": "All and Remove unknown",
+                        "command": "resync",
+                        "args": { "delete": true }
+                    }
+                ]
+            }
+        ]
+    }
+]
