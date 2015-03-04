@@ -1,6 +1,6 @@
 # sublime-SyncOnSave
 
-Sublime plugin for syncing on save or full project to one or more remotes using rsync.
+Sublime plugin for syncing a file on save or syncing a full project on demand to one or more remotes using rsync.
 
 ### Configuration
 
