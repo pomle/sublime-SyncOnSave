@@ -42,18 +42,18 @@ class ThreadedSyncer(threading.Thread):
         if self.delete:
             commands.append('--delete')
 
-        print ('Calling subprocess "%s" from working dir %s' %
+        print ('Calling subprocess %s from working dir %s' %
                (" ".join(commands), self.cwd))
 
         def complete():
-            sublime.status_message('Completed syncing path "%s" to "%s" in folder "%s"' %
-                                   (self.source, self.remote, self.cwd))
+            sublime.status_message('Completed syncing %s to %s' %
+                                   (self.source, self.remote))
 
         try:
             subprocess.check_call(commands, cwd=self.cwd)
             sublime.set_timeout(complete, 0)
         except subprocess.CalledProcessError as e:
-            sublime.error_message('Could not sync to %s\n%s' %
+            sublime.error_message('Error syncing to %s\n%s' %
                                   (self.remote, e))
 
 
@@ -84,7 +84,7 @@ def get_sync_config(view):
     for path in config:
         source = path.get('source')
         if source not in project_folders:
-            print ("Skipping %s because not project folder %s",
+            print ("Skipping %s because not a project folder %s",
                    (source, project_folders))
             continue
         parsed_config.append({
