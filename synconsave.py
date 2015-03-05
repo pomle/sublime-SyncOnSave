@@ -103,7 +103,7 @@ class ResyncCommand(sublime_plugin.TextCommand):
             sublime.message_dialog("No sync configured")
             return
 
-        if delete and not sublime.ok_cancel_dialog("Are you sure you want to sync and delete all unknown files?"):
+        if delete and not sublime.ok_cancel_dialog("Are you sure you want to sync all files to remotes and delete all unknown files from remotes?"):
             return
 
         for path in sync_config:
