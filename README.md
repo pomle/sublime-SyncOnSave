@@ -11,14 +11,14 @@ git clone https://github.com/pomle/sublime-SyncOnSave.git ~"/Library/Application
 ### Configuration
 
 You have to be in a project to use. The config is connected to the project settings.
-If you haven't already, find the menu item Project > Save Project As...
+If you haven't already, find the menu item **Project > Save Project As...**
 
-Then go to Project > Edit Project and add the settings clause. You have to specify exact folder as source and saved files must reside inside that folders. This is a safety precaution and to prevent syncing files that are open but not part of project.
+Then go to **Project > Edit Project** and add the settings clause. You have to specify exact folder as source and saved files must reside inside that folders. This is a safety precaution and to prevent syncing files that are open but not part of project.
 
 #### Minimal
 
 Will sync your first folder to a remote.
-```
+```json
 {
 	"folders":
 	[
@@ -36,7 +36,7 @@ Will sync your first folder to a remote.
 #### Multiple
 
 Will sync multiple local folders with multiple remotes.
-```
+```json
 {
     "folders":
     [
