@@ -15,6 +15,27 @@ If you haven't already, find the menu item Project > Save Project As...
 
 Then go to Project > Edit Project and add the settings clause. You have to specify exact folder as source and saved files must reside inside that folders. This is a safety precaution and to prevent syncing files that are open but not part of project.
 
+#### Minimal
+
+Will sync your first folder to a remote.
+```
+{
+	"folders":
+	[
+		{
+			"path": "/Users/pom/dev/some_project_to_reflect_remotely"
+		}
+	],
+	"settings":
+	{
+		"sync_on_save": "remote_server.cloud.company.net:dev/remote_project"
+	}
+}
+```
+
+#### Multiple
+
+Will sync multiple local folders with multiple remotes.
 ```
 {
     "folders":
