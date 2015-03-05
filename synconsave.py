@@ -45,10 +45,16 @@ class ThreadedSyncer(threading.Thread):
         print ('Calling subprocess "%s" from working dir %s' %
                (" ".join(commands), self.cwd))
 
-        subprocess.check_call(commands, cwd=self.cwd)
+        def complete():
+            sublime.status_message('Completed syncing path "%s" to "%s" in folder "%s"' %
+                                   (self.source, self.remote, self.cwd))
 
-        print ('Completed syncing path "%s" to "%s" in folder "%s"' %
-               (self.source, self.remote, self.cwd))
+        try:
+            subprocess.check_call(commands, cwd=self.cwd)
+            sublime.set_timeout(complete, 0)
+        except subprocess.CalledProcessError as e:
+            sublime.error_message('Could not sync to %s\n%s' %
+                                  (self.remote, e))
 
 
 def get_sync_config(view):
@@ -62,8 +68,8 @@ def get_sync_config(view):
         return False
 
     # Intercept legacy config and update it
-    if (isinstance(config, basestring)
-        or (isinstance(config, list) and isinstance(config[0], basestring))):
+    if (isinstance(config, basestring) or
+       (isinstance(config, list) and isinstance(config[0], basestring))):
         remotes = config
         if isinstance(remotes, basestring):
             remotes = [remotes]
