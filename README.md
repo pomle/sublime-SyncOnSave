@@ -2,12 +2,18 @@
 
 Sublime plugin for syncing a file on save or syncing a full project on demand to one or more remotes using rsync.
 
+### Installation
+
+```
+git clone https://github.com/pomle/sublime-SyncOnSave.git '~/Library/Application Support/Sublime Text 2/Packages/' SyncOnSave
+```
+
 ### Configuration
 
-You have to be in a project to use. The config is connected to the project settings. 
+You have to be in a project to use. The config is connected to the project settings.
 If you haven't already, find the menu item Project > Save Project As...
 
-The go to Project > Edit Project and add the settings clause.
+Then go to Project > Edit Project and add the settings clause. You have to specify exact folder as source and saved files must reside inside that folders. This is a safety precaution and to prevent syncing files that are open but not part of project.
 
 ```
 {
