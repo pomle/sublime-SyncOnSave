@@ -71,32 +71,35 @@ def get_sync_config(view):
         print 'Sync: Project not configured for sync.'
         return False
 
-    # Intercept legacy config and update it
-    if (isinstance(config, basestring) or
-       (isinstance(config, list) and isinstance(config[0], basestring))):
-        remotes = config
-        if isinstance(remotes, basestring):
-            remotes = [remotes]
+    try:
+        # Intercept legacy config and update it
+        if (isinstance(config, basestring) or
+           (isinstance(config, list) and isinstance(config[0], basestring))):
+            remotes = config
+            if isinstance(remotes, basestring):
+                remotes = [remotes]
 
-        # Legacy always uses only first folder
-        project_folders = [view.window().folders()[0]]
-        config = [{
-            "source": project_folders[0],
-            "remotes": remotes
-        }]
+            # Legacy always uses only first folder
+            project_folders = [view.window().folders()[0]]
+            config = [{
+                "source": project_folders[0],
+                "remotes": remotes
+            }]
 
-    for path in config:
-        source = path.get('source')
-        if source not in project_folders:
-            print ("Skipping %s because not a project folder %s",
-                   (source, project_folders))
-            continue
-        parsed_config.append({
-            "source": source,
-            "remotes": path.get('remotes'),
-        })
+        for path in config:
+            source = path.get('source')
+            if source not in project_folders:
+                print ("Skipping %s because not a project folder %s",
+                       (source, project_folders))
+                continue
+            parsed_config.append({
+                "source": source,
+                "remotes": path['remotes'],
+            })
 
-    return parsed_config
+        return parsed_config
+    except Exception as e:
+        sublime.error_message('Configuration broken\n%s' % e)
 
 
 class ResyncCommand(sublime_plugin.TextCommand):
