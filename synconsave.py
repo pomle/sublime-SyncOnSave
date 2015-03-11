@@ -16,10 +16,14 @@ class SyncManager(object):
         self.processes.append(process)
 
     def sync(self, delete=False):
+        remotes = []
         for process in self.processes:
             process.cwd = self.cwd
             process.delete = delete
             process.start()
+            remotes.append(process.remote)
+        sublime.status_message('Queued sync to %d host(s): %s' %
+                               (len(remotes), " ,".join(remotes)))
 
 
 class ThreadedSyncer(threading.Thread):
