@@ -38,7 +38,7 @@ class ThreadedSyncer(threading.Thread):
 
     def run(self):
         commands = ['rsync',
-                    '-ruv',
+                    '-aiv',
                     '--relative',
                     self.source,
                     self.remote.strip('/') + '/']
