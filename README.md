@@ -51,7 +51,7 @@ Will sync multiple local folders with multiple remotes.
             {
                 "source": "/Users/pom/dev/some_project_to_reflect_remotely",
                 "remotes": [
-                    "remote_server.cloud.company.nett:dev/remote_project",
+                    "remote_server.cloud.company.net:dev/remote_project",
                     "optional_secondary_remore_server.mirror.com:remote"
                 ]
             }
