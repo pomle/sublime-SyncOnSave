@@ -4,6 +4,8 @@ Sublime plugin for syncing a file on save or syncing a full project on demand to
 
 ### Installation
 
+#### OSX
+
 ```
 git clone https://github.com/pomle/sublime-SyncOnSave.git ~"/Library/Application Support/Sublime Text 2/Packages/SyncOnSave"
 ```
