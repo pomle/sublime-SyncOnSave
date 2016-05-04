@@ -3,7 +3,6 @@ import sublime_plugin
 import subprocess
 import threading
 
-
 class SyncManager(object):
 
     def __init__(self, cwd, source='./'):
@@ -68,15 +67,15 @@ def get_sync_config(view):
     parsed_config = []
 
     if not config:
-        print 'Sync: Project not configured for sync.'
+        print ('Sync: Project not configured for sync.')
         return False
 
     try:
         # Intercept legacy config and update it
-        if (isinstance(config, basestring) or
-           (isinstance(config, list) and isinstance(config[0], basestring))):
+        if (isinstance(config, str) or
+           (isinstance(config, list) and isinstance(config[0], str))):
             remotes = config
-            if isinstance(remotes, basestring):
+            if isinstance(remotes, str):
                 remotes = [remotes]
 
             # Legacy always uses only first folder
@@ -132,7 +131,7 @@ class SyncOnSave(sublime_plugin.EventListener):
         for path in sync_config:
             folder = path['source']
             if folder not in file_name:
-                print 'File %s not child of %s' % (file_name, folder)
+                print ('File %s not child of %s' % (file_name, folder))
                 continue
 
             relative_file_name = file_name.replace(folder, '').strip('/')
